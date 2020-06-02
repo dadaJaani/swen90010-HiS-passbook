@@ -7,64 +7,99 @@ with MyStringTokeniser;
 with PIN;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
+
 procedure Main is
+   
    DB : PasswordDatabase.Database;
-   U1 : PasswordDatabase.URL := PasswordDatabase.From_String("google.com");
-   P1 : PasswordDatabase.Password := PasswordDatabase.From_String("test_password");
+   Master_Pin : PIN.PIN; 
+   Is_Locked : Boolean := TRUE;
+
+   Command_PUT : constant String := "put";
+   Command_GET : constant String := "get";
+   Command_REM : constant String := "rem";
+   Command_LOCK : constant String := "lock";
+   Command_UNLOCK : constant String := "unlock";
+
    PIN1  : PIN.PIN := PIN.From_String("1234");
-   PIN2  : PIN.PIN := PIN.From_String("1234");
    package Lines is new MyString(Max_MyString_Length => 2048);
    S  : Lines.MyString;
+
+
 begin
 
-   Put(MyCommandLine.Command_Name); Put_Line(" is running!");
    Put("I was invoked with "); Put(MyCommandLine.Argument_Count,0); Put_Line(" arguments.");
-   for Arg in 1..MyCommandLine.Argument_Count loop
-      Put("Argument "); Put(Arg,0); Put(": """);
-      Put(MyCommandLine.Argument(Arg)); Put_Line("""");
-   end loop;
+   If MyCommandLine.Argument_Count = 1 then
+      Master_Pin := PIN.From_String(MyCommandLine.Argument(1));
+   else 
+      return; 
+   end if;
 
    PasswordDatabase.Init(DB);
-   Put_Line("Adding an entry to the database");
-   PasswordDatabase.Put(DB,U1,P1);
 
-   Put_Line("Reading the entry:");
-   Put_Line(PasswordDatabase.To_String(PasswordDatabase.Get(DB,U1)));
+   loop
+      Put_Line("Reading a line of input. Enter some text (at most 3 tokens): ");
+      Lines.Get_Line(S);
 
-   Put_Line("Removing the entry");
-   PasswordDatabase.Remove(DB,U1);
-   If PasswordDatabase.Has_Password_For(DB,U1) then
-      Put_Line("Entry still present! It is: ");
-      Put_Line(PasswordDatabase.To_String(PasswordDatabase.Get(DB,U1)));
-   else
-      Put_Line("Entry successfully removed");
-   end if;
+      Put_Line("Splitting the text into at most 4 tokens");
+      declare
+         T : MyStringTokeniser.TokenArray(1..5) := (others => (Start => 1, Length => 0));
+         NumTokens : Natural;
+      
+      begin
+         MyStringTokeniser.Tokenise(Lines.To_String(S),T,NumTokens);
+         Put("You entered "); Put(NumTokens); Put_Line(" tokens.");
+         if NumTokens > 3 then
+            Put_Line("Too many tokens!");
+         else
 
-   Put_Line("Reading a line of input. Enter some text (at most 3 tokens): ");
-   Lines.Get_Line(S);
+            case *first-TOKENNN* is
+               when Command_PUT => 
+                  Put(T(1)); Put_Line("Put command "); -- just to check if it works
+                  -- uncomment when ^ works 
+                  -- If Is_Locked = TRUE then
+                     -- DB.Put(DB, Tokens[2], Tokens[3]; -- second item: url, third: pw
 
-   Put_Line("Splitting the text into at most 4 tokens");
-   declare
-      T : MyStringTokeniser.TokenArray(1..5) := (others => (Start => 1, Length => 0));
-      NumTokens : Natural;
-   begin
-      MyStringTokeniser.Tokenise(Lines.To_String(S),T,NumTokens);
-      Put("You entered "); Put(NumTokens); Put_Line(" tokens.");
-      if NumTokens > 3 then
-         Put_Line("Too many tokens!");
-      else
-         for I in 1..NumTokens loop
-            declare
-               TokStr : String := Lines.To_String(Lines.Substring(S,T(I).Start,T(I).Start+T(I).Length-1));
-            begin
-               Put("Token "); Put(I); Put(" is: """);
-               Put(TokStr); Put_Line("""");
-            end;
-         end loop;
-      end if;
-   end;
+               when Command_GET => 
+                  Put(T(1)); Put_Line("GET command "); -- just to check if it works
 
-   If PIN."="(PIN1,PIN2) then
-      Put_Line("The two PINs are equal, as expected.");
-   end if;
+                  -- uncomment when ^ works 
+                  -- If Is_Locked = TRUE then
+                     -- DB.Get(DB, Tokens[2]; -- second item: url
+               when Command_REM => 
+                  Put(T(1)); Put_Line("REM command "); -- just to check if it works
+
+                  -- uncomment when ^ works 
+                  -- If Is_Locked = TRUE then
+                     -- DB.Get(DB, Tokens[2]; -- second item: url
+               when Command_LOCK => 
+                  Is_Locked := TRUE;
+                  -- Master_Pin := *seccond token*
+
+               when Command_UNLOCK => 
+                  -- *If secondtoken = Master_Pin  then*
+                  Is_Locked := FALSE;
+
+               when others =>
+                  null;
+
+            end case;
+
+         
+
+
+         end if;
+      end;
+   end loop;
+   
+
+   
+
+ 
+
+   
+   
 end Main;
+
+
+
+

@@ -24,8 +24,8 @@ D a-textio.ads		20200228061809 aef4d56d ada.text_io%s
 D a-unccon.ads		20200228061809 0e9b276f ada.unchecked_conversion%s
 D interfac.ads		20200228061809 5ab55268 interfaces%s
 D i-cstrea.ads		20200228061809 e53d8b8e interfaces.c_streams%s
-D mystring.ads		20200512062306 ce083c8f mystring%s
-D mystring.adb		20200512062306 8198c1c4 mystring%b
+D mystring.ads		20200602015630 ce083c8f mystring%s
+D mystring.adb		20200602015630 8198c1c4 mystring%b
 D system.ads		20200228061809 085b6ffb system%s
 D s-crtl.ads		20200228061809 0ebbdb71 system.crtl%s
 D s-exctab.ads		20200228061809 54135002 system.exception_table%s

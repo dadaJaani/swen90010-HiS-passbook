@@ -12,8 +12,8 @@ U mycommandline%s	mycommandline.ads	dbf720e9 EE NE OO PK
 
 D ada.ads		20200228061809 76789da1 ada%s
 D a-comlin.ads		20200228061809 4aa66568 ada.command_line%s
-D mycommandline.ads	20200512062312 dbf720e9 mycommandline%s
-D mycommandline.adb	20200602001215 1af737db mycommandline%b
+D mycommandline.ads	20200602015630 dbf720e9 mycommandline%s
+D mycommandline.adb	20200602015630 1af737db mycommandline%b
 D system.ads		20200228061809 085b6ffb system%s
 G a e
 G c Z s b [argument_count mycommandline 3 13 none]
