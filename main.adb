@@ -9,22 +9,24 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
 procedure Main is
-   
    DB : PasswordDatabase.Database;
    Master_Pin : PIN.PIN; 
    Is_Locked : Boolean := TRUE;
 
-   Command_PUT : constant String := "put";
-   Command_GET : constant String := "get";
-   Command_REM : constant String := "rem";
-   Command_LOCK : constant String := "lock";
-   Command_UNLOCK : constant String := "unlock";
+   package CommandStrings is new MyString(Max_MyString_Length => 6);
+   C  : CommandStrings.MyString;
 
-   PIN1  : PIN.PIN := PIN.From_String("1234");
    package Lines is new MyString(Max_MyString_Length => 2048);
    S  : Lines.MyString;
 
+   Command_PUT : CommandStrings.MyString := CommandStrings.From_String("put");
+   Command_GET : CommandStrings.MyString := CommandStrings.From_String("get");
+   Command_REM : CommandStrings.MyString := CommandStrings.From_String("rem");
+   Command_LOCK : CommandStrings.MyString := CommandStrings.From_String("lock");
+   Command_UNLOCK : CommandStrings.MyString := CommandStrings.From_String("unlock");
 
+   PIN1  : PIN.PIN := PIN.From_String("1234");
+ 
 begin
 
    Put("I was invoked with "); Put(MyCommandLine.Argument_Count,0); Put_Line(" arguments.");
@@ -51,39 +53,36 @@ begin
          if NumTokens > 3 then
             Put_Line("Too many tokens!");
          else
-
-            case *first-TOKENNN* is
-               when Command_PUT => 
-                  Put(T(1)); Put_Line("Put command "); -- just to check if it works
-                  -- uncomment when ^ works 
-                  -- If Is_Locked = TRUE then
-                     -- DB.Put(DB, Tokens[2], Tokens[3]; -- second item: url, third: pw
-
-               when Command_GET => 
-                  Put(T(1)); Put_Line("GET command "); -- just to check if it works
-
-                  -- uncomment when ^ works 
-                  -- If Is_Locked = TRUE then
-                     -- DB.Get(DB, Tokens[2]; -- second item: url
-               when Command_REM => 
-                  Put(T(1)); Put_Line("REM command "); -- just to check if it works
-
-                  -- uncomment when ^ works 
-                  -- If Is_Locked = TRUE then
-                     -- DB.Get(DB, Tokens[2]; -- second item: url
-               when Command_LOCK => 
-                  Is_Locked := TRUE;
-                  -- Master_Pin := *seccond token*
-
-               when Command_UNLOCK => 
-                  -- *If secondtoken = Master_Pin  then*
-                  Is_Locked := FALSE;
-
-               when others =>
-                  null;
-
-            end case;
-
+            for I in 1..NumTokens loop
+               declare
+                  TokStr : String := Lines.To_String(Lines.Substring(S,T(I).Start,T(I).Start+T(I).Length-1));
+               begin
+                  If I = 1 then
+                     If CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_GET) then
+                        C := Command_GET;
+                        Put(CommandStrings.To_String(C));
+                     elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_PUT) then 
+                        C := Command_PUT;
+                        Put(CommandStrings.To_String(C));
+                     elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_REM) then 
+                        C := Command_REM;
+                        Put(CommandStrings.To_String(C));
+                     elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_LOCK) then 
+                        C := Command_LOCK;
+                        Put(CommandStrings.To_String(C));
+                     elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_UNLOCK) then 
+                        C := Command_UNLOCK;
+                        Put(CommandStrings.To_String(C));
+                     else
+                        Put("INVALID COMMAND");
+                     end if;
+                  else 
+                     Put("Token "); Put(I); Put(" is: """);
+                     Put(TokStr); Put_Line("""");
+                  
+                  end if;
+            end;
+            end loop;
          
 
 
