@@ -14,12 +14,20 @@ package body MyStringTokeniser with SPARK_Mode is
       end if;
       Index := S'First;
       while OutIndex <= Tokens'Last and Index <= S'Last and Count < Tokens'Length loop
+
+         -- This loop invariant has been more or less explained in mystringtokeniser.ads
          pragma Loop_Invariant
            (for all J in Tokens'First..OutIndex-1 =>
               (Tokens(J).Start >= S'First and
                    Tokens(J).Length > 0) and then
             Tokens(J).Length-1 <= S'Last - Tokens(J).Start);
 
+         -- This loop invariant is necessary to explicitly map the relation between
+         -- Tokens'First, Count and OutIndex, which ensures that tokens are written 
+         -- to Tokens in the order which they are processed. Without this invariant,
+         -- given a situation with input string "t1 t2 t3" and Token array T, then
+         -- a post situation where T = (t3, t1, t2) would pass. This loop invariant 
+         -- ensures only T = (t1, t2, t3) would be a valid post situation.
          pragma Loop_Invariant (OutIndex = Tokens'First + Count);
 
          -- look for start of next token
