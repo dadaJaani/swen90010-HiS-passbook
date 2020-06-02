@@ -52,35 +52,7 @@ begin
             Put_Line("Too many tokens!");
          else
 
-            case *first-TOKENNN* is
-               when Command_PUT => 
-                  Put(T(1)); Put_Line("Put command "); -- just to check if it works
-                  -- uncomment when ^ works 
-                  -- If Is_Locked = TRUE then
-                     -- DB.Put(DB, Tokens[2], Tokens[3]; -- second item: url, third: pw
-
-               when Command_GET => 
-                  Put(T(1)); Put_Line("GET command "); -- just to check if it works
-
-                  -- uncomment when ^ works 
-                  -- If Is_Locked = TRUE then
-                     -- DB.Get(DB, Tokens[2]; -- second item: url
-               when Command_REM => 
-                  Put(T(1)); Put_Line("REM command "); -- just to check if it works
-
-                  -- uncomment when ^ works 
-                  -- If Is_Locked = TRUE then
-                     -- DB.Get(DB, Tokens[2]; -- second item: url
-               when Command_LOCK => 
-                  Is_Locked := TRUE;
-                  -- Master_Pin := *seccond token*
-
-               when Command_UNLOCK => 
-                  -- *If secondtoken = Master_Pin  then*
-                  Is_Locked := FALSE;
-
-               when others =>
-                  null;
+            
 
             end case;
 
