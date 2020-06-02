@@ -36,9 +36,9 @@ package MyStringTokeniser with SPARK_Mode is
       -- Tokens(Index).Length-1 <= S'Last - Tokens(Index).Start: This says that the length of Tokens(Index) 
       -- is not greater than S'Last - Tokens(Index).Start + 1. Necessary to ensure no token exceeded the 
       -- length of the input string S. Combined with previous condition, ensures all tokens are entirely 
-      -- derived from the input string S.
+      -- derived from the index range of input string S.
 
-      -- Tokens(Index).Length > 0: This says that the length fo Tokens(Index) is a value greater than 0, 
+      -- Tokens(Index).Length > 0: This says that the length of Tokens(Index) is a value greater than 0, 
       -- this ensures all tokens feature non-empty substrings of the input string S.
    
 
