@@ -13,8 +13,10 @@ procedure Main is
    Master_Pin : PIN.PIN; 
    Is_Locked : Boolean := TRUE;
 
+   U : PasswordDatabase.URL;
+   P : PasswordDatabase.Password;
+
    package CommandStrings is new MyString(Max_MyString_Length => 6);
-   C  : CommandStrings.MyString;
 
    package Lines is new MyString(Max_MyString_Length => 2048);
    S  : Lines.MyString;
@@ -25,11 +27,9 @@ procedure Main is
    Command_LOCK : CommandStrings.MyString := CommandStrings.From_String("lock");
    Command_UNLOCK : CommandStrings.MyString := CommandStrings.From_String("unlock");
 
-   PIN1  : PIN.PIN := PIN.From_String("1234");
+   PIN1  : PIN.PIN;
  
 begin
-
-   Put("I was invoked with "); Put(MyCommandLine.Argument_Count,0); Put_Line(" arguments.");
    If MyCommandLine.Argument_Count = 1 then
       Master_Pin := PIN.From_String(MyCommandLine.Argument(1));
    else 
@@ -39,66 +39,63 @@ begin
    PasswordDatabase.Init(DB);
 
    loop
-      Put_Line("Reading a line of input. Enter some text (at most 3 tokens): ");
+      If Is_Locked = TRUE then
+         Put("locked>   ");
+      else 
+         Put("unlocked> ");
+      end if;
+      
       Lines.Get_Line(S);
 
-      Put_Line("Splitting the text into at most 4 tokens");
       declare
          T : MyStringTokeniser.TokenArray(1..5) := (others => (Start => 1, Length => 0));
          NumTokens : Natural;
       
       begin
          MyStringTokeniser.Tokenise(Lines.To_String(S),T,NumTokens);
-         Put("You entered "); Put(NumTokens); Put_Line(" tokens.");
          if NumTokens > 3 then
             Put_Line("Too many tokens!");
+         elsif NumTokens = 0 then
+            Put_Line("It's empty you fucking idiot!");
          else
-            for I in 1..NumTokens loop
-               declare
-                  TokStr : String := Lines.To_String(Lines.Substring(S,T(I).Start,T(I).Start+T(I).Length-1));
-               begin
-                  If I = 1 then
-                     If CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_GET) then
-                        C := Command_GET;
-                        Put(CommandStrings.To_String(C));
-                        -- uncomment when ^ works 
-                        -- If Is_Locked = TRUE then
-                           -- DB.Get(DB, Tokens[2]; -- second item: url
-                     elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_PUT) then 
-                        C := Command_PUT;
-                        Put(CommandStrings.To_String(C));
-                        -- uncomment when ^ works 
-                        -- If Is_Locked = TRUE then
-                           -- DB.Put(DB, Tokens[2], Tokens[3]; -- second item: url, third: pw
-                     elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_REM) then 
-                        C := Command_REM;
-                        Put(CommandStrings.To_String(C));
-                        -- uncomment when ^ works 
-                        -- If Is_Locked = TRUE then
-                           -- DB.Get(DB, Tokens[2]; -- second item: url
-                     elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_LOCK) then 
-                        C := Command_LOCK;
-                        Put(CommandStrings.To_String(C));
-                        Is_Locked := TRUE;
-                        -- Master_Pin := *seccond token*
-                     elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_UNLOCK) then 
-                        C := Command_UNLOCK;
-                        Put(CommandStrings.To_String(C));
-                        -- *If secondtoken = Master_Pin  then*
-                        Is_Locked := FALSE;
-                     else
-                        Put("INVALID COMMAND");
+            declare
+               TokStr : String := Lines.To_String(Lines.Substring(S,T(1).Start,T(1).Start+T(1).Length-1));
+            begin
+               If CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_GET) then
+                  If Is_Locked = FALSE then
+                     U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
+                     If PasswordDatabase.Has_Password_For(DB, U) then
+                        P := PasswordDatabase.Get(DB, U);
+                        Put_Line(PasswordDatabase.To_String(P));
                      end if;
-                  else 
-                     Put("Token "); Put(I); Put(" is: """);
-                     Put(TokStr); Put_Line("""");
-                  
                   end if;
+               elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_PUT) then 
+                  If Is_Locked = FALSE then
+                     U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
+                     P := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(3).Start,T(3).Start+T(3).Length-1)));
+                     PasswordDatabase.Put(DB, U, P); 
+                  end if;
+               elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_REM) then 
+                  If Is_Locked = FALSE then
+                     U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
+                     PasswordDatabase.Remove(DB, U);
+                  end if;
+               elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_LOCK) then 
+                  If Is_Locked = FALSE then 
+                     Master_Pin := PIN.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
+                     Is_Locked := TRUE;
+                  end if;
+               elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_UNLOCK) then 
+                  If Is_Locked = TRUE then
+                     PIN1 := PIN.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
+                     If PIN."="(PIN1,Master_Pin) then 
+                        Is_Locked := FALSE;
+                     end if;
+                  end if;
+               else
+                  Put("INVALID COMMAND");
+               end if;
             end;
-            end loop;
-         
-
-
          end if;
       end;
    end loop;
