@@ -15,23 +15,26 @@ procedure Main is
    U : PasswordDatabase.URL;
    P : PasswordDatabase.Password;
 
-   package CommandStrings is new MyString(Max_MyString_Length => 6);
-
    package Lines is new MyString(Max_MyString_Length => 2048);
    S  : Lines.MyString;
 
-   Command_PUT : CommandStrings.MyString := CommandStrings.From_String("put");
-   Command_GET : CommandStrings.MyString := CommandStrings.From_String("get");
-   Command_REM : CommandStrings.MyString := CommandStrings.From_String("rem");
-   Command_LOCK : CommandStrings.MyString := CommandStrings.From_String("lock");
-   Command_UNLOCK : CommandStrings.MyString := CommandStrings.From_String("unlock");
+   Command_PUT : Lines.MyString := Lines.From_String("put");
+   Command_GET : Lines.MyString := Lines.From_String("get");
+   Command_REM : Lines.MyString := Lines.From_String("rem");
+   Command_LOCK : Lines.MyString := Lines.From_String("lock");
+   Command_UNLOCK : Lines.MyString := Lines.From_String("unlock");
 
    PIN1  : PIN.PIN;
  
 begin
+  
    If MyCommandLine.Argument_Count = 1 then
-      PIN1 := PIN.From_String(MyCommandLine.Argument(1));
-      PasswordManager.Init(M, PIN1);
+      If (MyCommandLine.Argument(1)'Length = 4) and (for all I in MyCommandLine.Argument(1)'Range => (MyCommandLine.Argument(1)(I) >= '0' and MyCommandLine.Argument(1)(I) <= '9')) then
+         PIN1 := PIN.From_String(MyCommandLine.Argument(1));
+         PasswordManager.Init(M, PIN1);
+      else
+         return;
+      end if;
    else 
       return; 
    end if;
@@ -59,25 +62,25 @@ begin
             declare
                TokStr : String := Lines.To_String(Lines.Substring(S,T(1).Start,T(1).Start+T(1).Length-1));
             begin
-               If CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_GET) then
+               If Lines.Equal(Lines.From_String(TokStr), Command_GET) then
                   U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
                   P := PasswordManager.Get(M, U);
                   Put_Line(PasswordDatabase.To_String(P));
-               elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_PUT) then 
+               elsif Lines.Equal(Lines.From_String(TokStr), Command_PUT) then 
                   U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
                   P := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(3).Start,T(3).Start+T(3).Length-1)));
                   PasswordManager.Put(M, U, P);
-               elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_REM) then
+               elsif Lines.Equal(Lines.From_String(TokStr), Command_REM) then
                   U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
                   PasswordManager.Remove(M, U);
-               elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_LOCK) then 
+               elsif Lines.Equal(Lines.From_String(TokStr), Command_LOCK) then 
                   PIN1 := PIN.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
                   PasswordManager.Lock(M, PIN1);
-               elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_UNLOCK) then 
+               elsif Lines.Equal(Lines.From_String(TokStr), Command_UNLOCK) then 
                   PIN1 := PIN.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
                   PasswordManager.Unlock(M, PIN1);
                else
-                  Put_Line("INVALID COMMAND");
+                  return;
                end if;
             end;
          end if;
