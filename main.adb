@@ -1,6 +1,7 @@
 pragma SPARK_Mode (On);
 
 with PasswordDatabase;
+with PasswordManager;
 with MyCommandLine;
 with MyString;
 with MyStringTokeniser;
@@ -9,9 +10,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
 procedure Main is
-   DB : PasswordDatabase.Database;
-   Master_Pin : PIN.PIN; 
-   Is_Locked : Boolean := TRUE;
+   M : PasswordManager.Manager;
 
    U : PasswordDatabase.URL;
    P : PasswordDatabase.Password;
@@ -31,15 +30,14 @@ procedure Main is
  
 begin
    If MyCommandLine.Argument_Count = 1 then
-      Master_Pin := PIN.From_String(MyCommandLine.Argument(1));
+      PIN1 := PIN.From_String(MyCommandLine.Argument(1));
+      PasswordManager.Init(M, PIN1);
    else 
       return; 
    end if;
 
-   PasswordDatabase.Init(DB);
-
    loop
-      If Is_Locked = TRUE then
+      If M.Is_Locked = TRUE then
          Put("locked>   ");
       else 
          Put("unlocked> ");
@@ -56,44 +54,30 @@ begin
          if NumTokens > 3 then
             Put_Line("Too many tokens!");
          elsif NumTokens = 0 then
-            Put_Line("It's empty you fucking idiot!");
+            Put_Line("No tokens!");
          else
             declare
                TokStr : String := Lines.To_String(Lines.Substring(S,T(1).Start,T(1).Start+T(1).Length-1));
             begin
                If CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_GET) then
-                  If Is_Locked = FALSE then
-                     U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
-                     If PasswordDatabase.Has_Password_For(DB, U) then
-                        P := PasswordDatabase.Get(DB, U);
-                        Put_Line(PasswordDatabase.To_String(P));
-                     end if;
-                  end if;
+                  U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
+                  P := PasswordManager.Get(M, U);
+                  Put_Line(PasswordDatabase.To_String(P));
                elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_PUT) then 
-                  If Is_Locked = FALSE then
-                     U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
-                     P := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(3).Start,T(3).Start+T(3).Length-1)));
-                     PasswordDatabase.Put(DB, U, P); 
-                  end if;
-               elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_REM) then 
-                  If Is_Locked = FALSE then
-                     U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
-                     PasswordDatabase.Remove(DB, U);
-                  end if;
+                  U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
+                  P := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(3).Start,T(3).Start+T(3).Length-1)));
+                  PasswordManager.Put(M, U, P);
+               elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_REM) then
+                  U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
+                  PasswordManager.Remove(M, U);
                elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_LOCK) then 
-                  If Is_Locked = FALSE then 
-                     Master_Pin := PIN.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
-                     Is_Locked := TRUE;
-                  end if;
+                  PIN1 := PIN.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
+                  PasswordManager.Lock(M, PIN1);
                elsif CommandStrings.Equal(CommandStrings.From_String(TokStr), Command_UNLOCK) then 
-                  If Is_Locked = TRUE then
-                     PIN1 := PIN.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
-                     If PIN."="(PIN1,Master_Pin) then 
-                        Is_Locked := FALSE;
-                     end if;
-                  end if;
+                  PIN1 := PIN.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
+                  PasswordManager.Unlock(M, PIN1);
                else
-                  Put("INVALID COMMAND");
+                  Put_Line("INVALID COMMAND");
                end if;
             end;
          end if;
