@@ -56,7 +56,7 @@ begin
          MyStringTokeniser.Tokenise(Lines.To_String(S),T,NumTokens);
          if NumTokens > 3 then
             Put_Line("Too many tokens!");
-         elsif NumTokens = 0 then
+         elsif NumTokens <= 0 then
             Put_Line("No tokens!");
          else
             declare

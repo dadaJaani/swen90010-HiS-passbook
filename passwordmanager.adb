@@ -41,8 +41,8 @@ package body PasswordManager is
    begin
       If M.Is_Locked = FALSE then
          return PasswordDatabase.Get(M.Database, U);
-      else
-         return PasswordDatabase.From_String("Error: Manager is Locked");
+      -- else  -- assignment spec says the program does nothing if its locked
+      --   return PasswordDatabase.From_String("Error: Manager is Locked");
       end if;
    end Get;
 
