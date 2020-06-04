@@ -27,7 +27,6 @@ package PasswordManager with SPARK_Mode is
      
     procedure Unlock(M : in out Manager; P : in PIN.PIN);
    
-    function Get(M : in Manager; U : in URL) return Password with 
-        Pre => PasswordDatabase.Has_Password_For(M.Database,U);
+    function Get(M : in Manager; U : in URL) return Password; 
 
 end PasswordManager;

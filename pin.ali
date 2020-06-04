@@ -11,10 +11,10 @@ Z system.exp_int%s	s-expint.adb		s-expint.ali
 
 U pin%s			pin.ads			553c8633 EE NE OO PK IU
 
-D pin.ads		20200602015630 553c8633 pin%s
-D pin.adb		20200602015630 59629ba5 pin%b
-D system.ads		20200228061809 085b6ffb system%s
-D s-expint.ads		20200228061809 192336fc system.exp_int%s
+D pin.ads		20200604034346 553c8633 pin%s
+D pin.adb		20200604034346 59629ba5 pin%b
+D system.ads		20200228061810 32a08138 system%s
+D s-expint.ads		20200228061810 192336fc system.exp_int%s
 G a e
 G c Z s b [from_string pin 5 13 none]
 X 1 pin.ads

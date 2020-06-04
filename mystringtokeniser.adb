@@ -19,7 +19,13 @@ package body MyStringTokeniser with SPARK_Mode is
               (Tokens(J).Start >= S'First and
                    Tokens(J).Length > 0) and then
             Tokens(J).Length-1 <= S'Last - Tokens(J).Start);
-
+         
+         -- Conditions that loop invariant must satisfy:
+         --     1. It must be true before the loop.  
+         --     2. It must be true while the loop is in progress.  
+         --     3. It must be true after the loop. 
+         -- This loop variant satisfies all three conditions.
+         --
          -- This loop invariant is necessary to explicitly map the relation between
          -- Tokens'First, Count and OutIndex, which ensures that tokens are written 
          -- to Tokens in the order which they are processed. Without this invariant,

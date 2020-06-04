@@ -11,7 +11,6 @@ with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
 procedure Main is
    M : PasswordManager.Manager;
-
    U : PasswordDatabase.URL;
    P : PasswordDatabase.Password;
 
@@ -62,23 +61,98 @@ begin
             declare
                TokStr : String := Lines.To_String(Lines.Substring(S,T(1).Start,T(1).Start+T(1).Length-1));
             begin
-               If Lines.Equal(Lines.From_String(TokStr), Command_GET) then
-                  U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
-                  P := PasswordManager.Get(M, U);
-                  Put_Line(PasswordDatabase.To_String(P));
-               elsif Lines.Equal(Lines.From_String(TokStr), Command_PUT) then 
-                  U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
-                  P := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(3).Start,T(3).Start+T(3).Length-1)));
-                  PasswordManager.Put(M, U, P);
-               elsif Lines.Equal(Lines.From_String(TokStr), Command_REM) then
-                  U := PasswordDatabase.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
-                  PasswordManager.Remove(M, U);
-               elsif Lines.Equal(Lines.From_String(TokStr), Command_LOCK) then 
-                  PIN1 := PIN.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
-                  PasswordManager.Lock(M, PIN1);
-               elsif Lines.Equal(Lines.From_String(TokStr), Command_UNLOCK) then 
-                  PIN1 := PIN.From_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
-                  PasswordManager.Unlock(M, PIN1);
+               -- ----------------------------------------------------------------------------------------------------------------------------------
+               -- When Command is to GET a Password for the URL from the Password Manager
+               -- ----------------------------------------------------------------------------------------------------------------------------------
+               If Lines.Equal(Lines.From_String(TokStr), Command_GET) and NumTokens = 2 then
+                  If T(2).Start <= T(2).Start+T(2).Length-1 then
+                     declare
+                        firstToken:  String := Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1));
+                     begin  
+                        If firstToken'Length <= PasswordDatabase.Max_URL_Length then
+                    
+                           U := PasswordDatabase.From_String(firstToken);
+                           If PasswordDatabase.Has_Password_For(M.Database, U) then -- Satisfies HAS_PASSWORD_FOR precondition
+                              P := PasswordManager.Get(M, U);
+                              Put_Line(PasswordDatabase.To_String(P));
+                           end if;
+                     
+                        end if;
+                     end;	
+                  end if;
+                  
+               -- ----------------------------------------------------------------------------------------------------------------------------------
+               -- When Command is to Put a URL into the Password Manager
+               -- ----------------------------------------------------------------------------------------------------------------------------------
+               elsif Lines.Equal(Lines.From_String(TokStr), Command_PUT) and NumTokens = 3 then 
+                  If T(2).Start <= T(2).Start+T(2).Length-1 and T(3).Start <= T(3).Start+T(3).Length-1 then
+                  	 declare
+                        firstToken: String := Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1));
+                        secondToken: String := Lines.To_String(Lines.Substring(S,T(3).Start,T(3).Start+T(3).Length-1));
+                     begin  
+                        If firstToken'Length <= PasswordDatabase.Max_URL_Length and secondToken'Length <= PasswordDatabase.Max_Password_Length then
+                           U := PasswordDatabase.From_String(firstToken);
+                           P := PasswordDatabase.From_String(secondToken);
+                           PasswordManager.Put(M, U, P);
+                        end if;
+                     end;
+                  end if;	
+                  
+               -- ----------------------------------------------------------------------------------------------------------------------------------
+               -- When Command is to Remove a URL from the Password Manager
+               -- ----------------------------------------------------------------------------------------------------------------------------------
+               elsif Lines.Equal(Lines.From_String(TokStr), Command_REM) and NumTokens = 2 then
+                  If T(2).Start <= T(2).Start+T(2).Length-1 then
+                     declare
+                        firstToken:  String := Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1));
+                     begin  
+                        If firstToken'Length <= PasswordDatabase.Max_URL_Length then
+                           U := PasswordDatabase.From_String(firstToken);
+                           If PasswordDatabase.Has_Password_For(M.Database, U) then -- Satisfies HAS_PASSWORD_FOR precondition
+                              PasswordManager.Remove(M, U);
+                           end if;
+                        end if;
+                     end;	
+                  end if;
+               
+               -- ----------------------------------------------------------------------------------------------------------------------------------
+               -- When Command is to Lock the Password Manager
+               -- ----------------------------------------------------------------------------------------------------------------------------------
+               elsif Lines.Equal(Lines.From_String(TokStr), Command_LOCK) and NumTokens = 2 then 
+                  If T(2).Start <= T(2).Start+T(2).Length-1 then
+                  	 declare
+                        firstToken: String := Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1));
+                     begin  
+                        
+                        If firstToken'Length = 4 and (for all I in firstToken'Range => firstToken(I) >= '0' and firstToken(I) <= '9') then
+                           PIN1 := PIN.From_String(firstToken);
+                           PasswordManager.Lock(M, PIN1);
+                        end if;
+                     end;
+                  end if;	
+                  
+                  
+                  
+               -- ----------------------------------------------------------------------------------------------------------------------------------
+               -- When Command is to Unlock the Password Manager
+               -- ----------------------------------------------------------------------------------------------------------------------------------                  
+               elsif Lines.Equal(Lines.From_String(TokStr), Command_UNLOCK) and NumTokens = 2 then 
+                  If T(2).Start <= T(2).Start+T(2).Length-1 then
+                  	 declare
+                        firstToken: String := Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1));
+                     begin  
+                        
+                        If firstToken'Length = 4 and (for all I in firstToken'Range => firstToken(I) >= '0' and firstToken(I) <= '9') then
+                           PIN1 := PIN.From_String(firstToken);
+                           PasswordManager.Unlock(M, PIN1);
+                        end if;
+                     end;
+                  end if;	
+                   
+                  
+               -- ----------------------------------------------------------------------------------------------------------------------------------
+               -- When Command is to Not Recognised by the Password Manager
+               -- ----------------------------------------------------------------------------------------------------------------------------------               
                else
                   return;
                end if;
