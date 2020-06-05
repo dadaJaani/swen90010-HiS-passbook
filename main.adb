@@ -77,7 +77,7 @@
 -- This annotation encodes this security property because this function
 -- represents explicit performance of the Lock operation.
 -- This annotation encodes this security property because in PM.Lock, 
--- fter the Lock operation is performed, M.Is_Locked should be equal to TRUE,
+-- after the Lock operation is performed, M.Is_Locked should be equal to TRUE,
 -- and proving this is sufficient to prove the property.
 
 pragma SPARK_Mode (On);
