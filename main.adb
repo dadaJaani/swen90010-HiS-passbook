@@ -1,5 +1,8 @@
--- Authors: Waqas Rehmani (1035514) & Angus Hudson (835808)
-
+-- ---------------------------------------------------------------------------------
+-- Authors: 
+--    -  Waqas Rehmani | 1035514
+--    -  Angus Hudson  |  835808
+-- ---------------------------------------------------------------------------------
 -- Property One: The Get, Put, Remove and Lock operations can only ever be
 -- performed when the password manager is in the unlocked state.
 
@@ -11,6 +14,7 @@
 -- Is_Locked represents the state of the Password Manager, is sufficient
 -- to prove the property.
 
+-- ---------------------------------------------------------------------------------
 -- Property Two: The Unlock operation can only ever be performed when the
 -- password manager is in the locked state.
 
@@ -22,10 +26,11 @@
 -- represents the state of the Password Manager, is sufficient to prove 
 -- the property.
 
+-- ---------------------------------------------------------------------------------
 -- Property Three: The Lock operation, when it is performed, should update
 -- the master PIN with the new PIN that is supplied.
 
--- post => PIN."="(M.Master_Pin, P); for PasswordManager.Lock
+-- post => PIN."="(M.Master_Pin, P); for PasswordManager.Lock 
 
 -- This annotation encodes this security property because in PM.Lock, P
 -- represents the new supplied PIN. M.Master_Pin represents the master PIN
@@ -33,6 +38,7 @@
 -- is performed, M.Master_Pin should be equal to P, and proving this is
 -- sufficient to prove the property.
 
+-- ---------------------------------------------------------------------------------
 -- Property Four: The Unlock operation, when performed, should only change
 -- the password manager to the unlocked state if the supplied PIN matches
 -- the master PIN.
@@ -40,13 +46,14 @@
 -- post => (if PIN."="(M.Master_Pin, P) then M.Is_Locked = FALSE else
 --          M.Is_Locked = TRUE); For PasswordManager.Unlock
 
--- This annotation encodes this security property because in PM.Lock, P
+-- This annotation encodes this security property because in PM.Unlock, P
 -- represents the supplied PIN. M.Master_Pin represents the master PIN, it
 -- therefore follows that in the case the two are equal, M.Is_Locked, 
 -- representing the state of the password manager, should be in the unlocked
 -- state, and otherwise should remain in the locked state. Therefore, proving
 -- the above is sufficient to prove the property.
 
+-- ---------------------------------------------------------------------------------
 -- Property Five: During initialisation of the password manager, the
 -- password manager is generated with a master PIN equivalent to the supplied
 -- PIN, and begin in the locked state.
@@ -60,6 +67,18 @@
 -- Also, since M.Is_Locked represents the state of the password manager, 
 -- M.Is_Locked should be TRUE, or in the locked state. Due to this, proving
 -- the above is sufficient to prove the property.
+
+-- ---------------------------------------------------------------------------------
+-- Property Six: The Lock operation, when it is performed, should lock the
+-- password manager.
+
+-- post => M.Is_Locked = TRUE; for PasswordManager.Lock
+
+-- This annotation encodes this security property because this function
+-- represents explicit performance of the Lock operation.
+-- This annotation encodes this security property because in PM.Lock, 
+-- fter the Lock operation is performed, M.Is_Locked should be equal to TRUE,
+-- and proving this is sufficient to prove the property.
 
 pragma SPARK_Mode (On);
 
@@ -261,13 +280,6 @@ begin
          end if;
       end;
    end loop;
-   
-
-   
-
- 
-
-   
    
 end Main;
 

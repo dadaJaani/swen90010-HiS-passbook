@@ -28,7 +28,7 @@ package PasswordManager with SPARK_Mode is
 
    procedure Lock(M : in out Manager; P : in PIN.PIN) with
      pre => M.Is_Locked = FALSE, 
-     post => PIN."="(M.Master_Pin, P);
+     post => PIN."="(M.Master_Pin, P) and M.Is_Locked = TRUE;
      
    procedure Unlock(M : in out Manager; P : in PIN.PIN) with
      pre => M.Is_Locked = TRUE,
